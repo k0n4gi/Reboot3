@@ -44,38 +44,74 @@ def memoryDump():
 
 def userAssist():
 	print("\n==========UserAssist File==========")
-	output_folder = os.path.join(os.getcwd(), "UserAssist")
-	userassist_key_path = r"Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist"
 
-	# "MemoryDump" 폴더 생성 후 저장
-	if not os.path.exists(output_folder):
-		os.makedirs(output_folder)
+	keys_to_copy = [
+		# 실행파일 기록 subkey
+        r"Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count",
+		# 바로가기 실행 기록 subkey
+        r"Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count"
+    ]
+
+	current_directory = os.getcwd()
+	destination_folder = os.path.join(current_directory, "UserAssist")
+
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
 
 	try:
-		with winreg.OpenKey(winreg.HKEY_CURRENT_USER, userassist_key_path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
-			userAssistsRegistry(output_folder, key)
-			print(f"UserAssist data has been saved to {output_folder}")
+		with winreg.OpenKey(winreg.HKEY_CURRENT_USER, keys_to_copy[0], 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+			userAssistRegistry(key, destination_folder, 1)
+		with winreg.OpenKey(winreg.HKEY_CURRENT_USER, keys_to_copy[1], 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+			userAssistRegistry(key, destination_folder, 2)
 	except Exception as e:
 		print(f"Error: {e}")
 
+def sanitize_filename(filename):
+    # 파일 이름에 유효하지 않은 문자를 대체
+    invalid_chars = ['\\', '/', ':', '*', '?', '"', '<', '>', '|', '.', '&', '!', '@', '#', '$', '%', '^', '(', ')', '[', ']', '{', '}', '+', '=', ',', ';', '`', "'", '~', ' ']
+    for char in invalid_chars:
+        filename = filename.replace(char, '_')
 
-def userAssistsRegistry(output_folder, registry_key):
-    try:
-        with open(output_folder, 'w') as file:
-            subkey_count, _, _ = winreg.QueryInfoKey(registry_key)
-            for i in range(subkey_count):
-                subkey_name = winreg.EnumKey(registry_key, i)
-                subkey_path = f"{output_folder}_{subkey_name}.txt"
-                subkey = winreg.OpenKey(registry_key, subkey_name)
-                file.write(f"Subkey: {subkey_name}\n")
-                subkey_count, _, _ = winreg.QueryInfoKey(subkey)
-                for j in range(subkey_count):
-                    value_name, value_data, _ = winreg.EnumValue(subkey, j)
-                    file.write(f"  {value_name}: {value_data}\n")
-                file.write("\n")
-                userAssistsRegistry(subkey, subkey_path)
-    except Exception as e:
-        print(f"Error: {e}")
+    # 파일 이름을 최대 100자로 제한
+    return filename[:100]
+
+def userAssistRegistry(subkey, output_directory, num):
+	try:
+		if not os.path.exists(output_directory):
+			os.makedirs(output_directory)
+			
+		if num == 1:	
+			subkey_name = str(winreg.QueryInfoKey(subkey)[0])
+			subkey_path = os.path.join(output_directory, "CEBFF5CD-ACE2-4F4F-9178-9926F41749EA")
+		else:
+			subkey_name = str(winreg.QueryInfoKey(subkey)[0])
+			subkey_path = os.path.join(output_directory, "F4E57C4B-2036-45F0-A9AB-443BCFE33D9F")
+
+		if not os.path.exists(subkey_path):
+			os.makedirs(subkey_path)
+
+		i = 0
+		while True:
+			try:
+				value_name, value_data, _ = winreg.EnumValue(subkey, i)
+				value_output_file = os.path.join(subkey_path, f"{sanitize_filename(value_name)}.txt")
+
+                # 중간 디렉터리가 없는 경우 생성
+				value_output_dir = os.path.dirname(value_output_file)
+				if not os.path.exists(value_output_dir):
+					os.makedirs(value_output_dir)
+                
+				with open(value_output_file, 'w') as file:
+					file.write(str(value_data))  # value_data를 문자열로 변환하여 쓰기
+				i += 1
+			except OSError as e:
+				print(f"Error while processing subkey {subkey_name}: {e}")
+				break
+
+		print(f"Data from subkey {subkey_name} has been saved to {subkey_path}")
+	except Exception as e:
+		print(f"Error: {e}")
 
 def registry():
 	print("\n==========Registry File==========")
