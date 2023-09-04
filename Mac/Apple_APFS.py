@@ -1,24 +1,25 @@
-# 코드를 진행하기 전 해결 사항
-# 1. 시스템 환경설정
-# 2. 보안 및 개인 정보 보호
-# 3. 전체 디스크 접근 권한
-# 4. Terminal 관련 앱 권한 승인
-# 5. diskutil list 명령어로 APFS 디스크 찾은 후 해당 APFS dump 진행
-# 6. 보통 APFS는 /dev/disk0s2 입니다.
-
+import os
 import subprocess
 
-def dump_partition(partition, output_file="APPLE_APFS.raw"):
+def dump_partition(partition, output_file):
     # dd 명령어를 사용하여 파티션을 덤프
     cmd = ["sudo", "dd", "if=" + partition, "of=" + output_file, "bs=1M"]
     subprocess.run(cmd)
 
 def main():
+    # 'mac_result' 폴더 생성 혹은 확인
+    results_folder = 'mac_result'
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
+
+    # 결과값 저장 경로를 'mac_result' 폴더 내로 지정
+    output_file_path = os.path.join(results_folder, "APPLE_APFS.raw")
+
     partition = input("Please enter the APFS partition identifier (e.g., /dev/disk0s2): ")
     
     if partition:
-        print(f"Dumping {partition} to APPLE_APFS.raw...")
-        dump_partition(partition)
+        print(f"Dumping {partition} to {output_file_path}...")
+        dump_partition(partition, output_file_path)
         print("Dump complete.")
     else:
         print("Invalid partition identifier.")

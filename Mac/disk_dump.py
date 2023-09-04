@@ -34,20 +34,17 @@ def get_all_disks():
     return disks
 
 if __name__ == '__main__':
-    # 사용자의 바탕화면에 폴더를 생성합니다.
-    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-    dump_folder = os.path.join(desktop_path, "disk_dump_file")
-    
-    if not os.path.exists(dump_folder):
-        os.makedirs(dump_folder)
-    
+    # 'mac_result' 폴더 생성 혹은 확인
+    results_folder = 'mac_result'
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
+
     # 모든 디스크 목록을 가져옵니다.
     all_disks = get_all_disks()
     
     # 각 디스크를 덤프합니다.
     for disk in all_disks:
-        destination = os.path.join(dump_folder, f"{os.path.basename(disk)}_dump.img")
+        destination = os.path.join(results_folder, f"{os.path.basename(disk)}_dump.img")
         ddrescue_disk(disk, destination)
-    
     
     print("이미징이 완료되었습니다.")

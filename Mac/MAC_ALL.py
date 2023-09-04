@@ -64,6 +64,30 @@ def mac_feature13():
     print("web_history")
     os.system('sudo python3 ./Mac/web_history.py') 
 
+def mac_feature14():
+    print("APFS")
+    os.system('sudo python3 ./Mac/Apple_APFS.py') 
+
+def mac_feature15():
+    print("Disk_dump")
+    os.system('sudo python3 ./Mac/disk_dump.py') 
+
+def mac_feature16():
+    print("Eventlog")
+    os.system('sudo python3 ./Mac/Eventlog.py') 
+
+def mac_feature17():
+    print("Process")
+    os.system('sudo python3 ./Mac/process.py') 
+
+def mac_feature18():
+    print("Launch_list")
+    os.system('sudo python3 ./Mac/launch_list.py') 
+
+def mac_feature19():
+    print("System_information")
+    os.system('sudo python3 ./Mac/system_infor.py') 
+
 def save_to_txt():
     name = input("Enter your NAME: ")
     days = input("Enter the number of DAYS: ")
@@ -99,6 +123,12 @@ def mac_main():
         print("11. bash_zsh_log")
         print("12. Propery_list")
         print("13. Web_history")
+        print("14. APFS")
+        print("15. Disk_dump")
+        print("16. Eventlog")
+        print("17. Process")
+        print("18. Launch_list")
+        print("19. System_information")
 
         print("0. Exit and Save to txt")
 
@@ -129,19 +159,19 @@ def mac_main():
         elif choice == '12':
             mac_feature12()
         elif choice == '13':
-         mac_feature13()
-        # elif choice == '14':
-        #     mac_feature14()
-        # elif choice == '15':
-        #     mac_feature15()
-        # elif choice == '16':
-        #     mac_feature16()
-        # elif choice == '17':
-        #     mac_feature17()
-        # elif choice == '18':
-        #     mac_feature18()
-        # elif choice == '19':
-        #     mac_feature19()
+            mac_feature13()
+        elif choice == '14':
+            mac_feature14()
+        elif choice == '15':
+            mac_feature15()
+        elif choice == '16':
+           mac_feature16()
+        elif choice == '17':
+            mac_feature17()
+        elif choice == '18':
+            mac_feature18()
+        elif choice == '19':
+            mac_feature19()
         elif choice == '0':
             save_to_txt()
             print("Exiting MAC_ALL.py and returning to main menu...")

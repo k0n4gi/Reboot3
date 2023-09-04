@@ -1,5 +1,3 @@
-#이벤트 로그 수집기, 원하는 시간대를 설정하여 로그 수집 가능 기본적으로 바탕화면에 저장하는 형태
-#타임 스탬프, 시스템 정보(부팅 및 종료 시간, 시스템 업데이트, 하드웨어 상태),응용 프로그램 및 서비스 로그, 보안정보(로그인 시도, 권한 변경), 네트워크 활동
 import subprocess
 import os
 
@@ -20,18 +18,23 @@ def collect_logs(start_time, end_time):
         return None
 
 def main():
+    # 'mac_result' 폴더 생성 혹은 확인
+    results_folder = 'mac_result'
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
+
     start_time = input("Enter the start time for log collection (format: 'yyyy-mm-dd hh:mm:ss'): ")
     end_time = input("Enter the end time for log collection (format: 'yyyy-mm-dd hh:mm:ss'): ")
 
     logs = collect_logs(start_time, end_time)
     
     if logs:
-        # 바탕화면에 파일로 저장
-        desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-        with open(os.path.join(desktop_path, "collected_logs.txt"), 'w') as file:
+        # 결과값 저장 경로를 'mac_result' 폴더 내로 지정
+        result_file_path = os.path.join(results_folder, "collected_logs.txt")
+        with open(result_file_path, 'w') as file:
             file.write(logs)
         
-        print("Logs collected and saved to your desktop.")
+        print(f"Logs collected and saved to {result_file_path}.")
 
 if __name__ == "__main__":
     main()

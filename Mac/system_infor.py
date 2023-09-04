@@ -27,7 +27,15 @@ def get_logged_in_users():
     return subprocess.check_output(['who']).decode()
 
 def main():
-    with open('system_information.txt', 'w') as file:
+    # 'mac_result' 폴더 생성 혹은 확인
+    results_folder = 'mac_result'
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
+
+    # 결과값 저장 경로를 'mac_result' 폴더 내로 지정
+    result_file_path = os.path.join(results_folder, "system_information.txt")
+    
+    with open(result_file_path, 'w') as file:
         file.write("OS Version: " + get_os_version() + '\n')
         file.write("Architecture: " + get_architecture() + '\n')
         file.write("Username: " + get_username() + '\n')
@@ -35,6 +43,8 @@ def main():
         file.write("Network Info:\n" + get_network_info() + '\n')
         file.write("Disk Usage:\n" + get_disk_usage() + '\n')
         file.write("Logged-in Users:\n" + get_logged_in_users() + '\n')
+
+    print(f"System information saved to {result_file_path}.")
 
 if __name__ == '__main__':
     main()

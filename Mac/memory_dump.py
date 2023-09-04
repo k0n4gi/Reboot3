@@ -1,11 +1,14 @@
-#sudo로 실행
-#Rekall 오픈소스 사용
-#apple Sillicon에서는 사용 불가능
 import subprocess
 import os
 
 def capture_memory_dump(kext_path):
-    output_path = os.path.join(os.getcwd(), "memory_dump.raw")
+    # 'mac_result' 폴더 생성 혹은 확인
+    results_folder = 'mac_result'
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
+
+    # 결과값 저장 경로를 'mac_result' 폴더 내로 지정
+    output_path = os.path.join(os.getcwd(), results_folder, "memory_dump.raw")
     
     # MacPmem의 kext를 로드합니다.
     kextload_cmd = ["sudo", "kextload", kext_path]
@@ -21,6 +24,6 @@ def capture_memory_dump(kext_path):
 
     print(f"Memory dump saved to {output_path}")
 
-# 실행 예제
+
 kext_path = "절대경로 투입/MacPmem.kext"
 capture_memory_dump(kext_path)
