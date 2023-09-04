@@ -9,6 +9,7 @@ def get_all_activities():
         return f"Error: {e}"
 
 def save_to_file(filename, content):
+    filename = './Mac/mac_result/all_log_activities.txt'
     with open(filename, 'a') as file:
         file.write(content)
 

@@ -19,8 +19,11 @@ def get_open_handles():
 
     return open_handles
 
-def save_to_file(filename, content):
-    with open(filename, 'w') as file:
+def save_to_file(file_path, content):
+          # 저장할 파일의 경로 지정
+    file_path = './Mac/mac_result/open_handles.txt'  # 원하는 경로로 변경
+
+    with open(file_path, 'w') as file:
         for handle_type, handle_name in content:
             file.write(f"Type: {handle_type} | Name: {handle_name}\n")
 

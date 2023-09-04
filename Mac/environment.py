@@ -2,7 +2,7 @@ import os
 
 def save_environment_variables_to_file(filename):
     environment_variables = os.environ
-
+    filename = './Mac/mac_result/environment_variables.txt'
     with open(filename, 'w') as file:
         file.write("환경 변수:\n")
         for variable, value in environment_variables.items():

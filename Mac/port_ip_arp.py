@@ -46,7 +46,10 @@ if __name__ == "__main__":
     ip_address = get_ip_address()
     arp_address = get_arp_address()
 
-    with open('port_ip_arp.txt', 'w') as file:
+      # 저장할 파일의 경로 지정
+    file_path = './Mac/mac_result/port_ip_arp.txt'  # 원하는 경로로 변경
+
+    with open(file_path, 'w') as file:
         file.write("열린 포트:\n")
         for port in open_ports:
             file.write(str(port) + '\n')

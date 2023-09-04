@@ -28,8 +28,8 @@ if os.path.exists(zsh_history_path):
         print(".zsh_history: Unable to decode using ISO-8859-1")
 
 # 결과를 텍스트 파일에 저장
-bash_output_path = "bash_history.txt"
-zsh_output_path = "zsh_history.txt"
+bash_output_path = "./Mac/mac_result/bash_history.txt"
+zsh_output_path = "./Mac//mac_result/zsh_history.txt"
 
 with open(bash_output_path, 'w') as bash_output_file:
     for command in bash_commands:

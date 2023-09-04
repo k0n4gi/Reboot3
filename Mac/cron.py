@@ -8,6 +8,7 @@ def get_cron_jobs():
         return f"Error: {e.output.strip()}"
 
 def save_to_file(data, filename):
+    filename = './Mac/mac_result/crone.txt'
     with open(filename, "w") as f:
         f.write(data)
 

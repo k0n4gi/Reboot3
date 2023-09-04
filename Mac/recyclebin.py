@@ -16,15 +16,13 @@ if username=="root":
          if ask=='y' or ask=="Y":
               break
          
-destination_dir= "./Trash_DS"  # 추출된 데이터가 저장될 디렉토리
-if not os.path.exists(destination_dir):
-    os.mkdir(destination_dir)
+
 
 #####Bookmarks.plist
 try:
 # 파일 복사
     source_path = f"/Users/{username}/.Trash/.DS_Store"  # 복사할 대상
-    destination_path = "./Trash_DS/trash_DS_Store"#저장소
+    destination_path = "./Mac/mac_result/trash_DS_Store"#저장소
 
     # 파일이 이미 존재하면 삭제
     if os.path.exists(destination_path):
@@ -35,4 +33,4 @@ try:
     
     print( f"/Users/{username}/.Trash/.DS_Store가 복사되었습니다." )
 except:  
-        print( f"Bookmarks.plist에 실패했습니다" )
+        print( f"복사에 실패했습니다" )

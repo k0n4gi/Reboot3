@@ -16,11 +16,7 @@ if username=="root":
          if ask=='y' or ask=="Y":
               break
 
-####운영체제 버전 정보 저장
 
-destination_dir= "./web_history"  # 추출된 데이터가 저장될 디렉토리
-if not os.path.exists(destination_dir):
-    os.mkdir(destination_dir)
 
 
 
@@ -30,7 +26,7 @@ if not os.path.exists(destination_dir):
 try:
 # 파일 복사
     source_path = f"/Users/{username}/Library/Safari/Bookmarks.plist"  # 복사할 대상
-    destination_path = "./web_history/Bookmarks.plist"#저장소
+    destination_path = "./Mac/mac_result/Bookmarks.plist"#저장소
 
     # 파일이 이미 존재하면 삭제
     if os.path.exists(destination_path):
@@ -47,7 +43,7 @@ except:
 ####historyDB복사
 try:
     source_path = f"/Users/{username}/Library/Safari/History.db"  # 복사할 대상
-    destination_path = "./web_history/History.db"#저장소
+    destination_path = "./Mac/mac_result/History.db"#저장소
 
     # 파일이 이미 존재하면 삭제
     if os.path.exists(destination_path):
@@ -63,7 +59,7 @@ except:
 ####historyDB복사
 try:
     source_path = f"/Users/{username}/Library/Safari/Downloads.plist"  # 복사할 대상
-    destination_path = "./web_history/Downloads.plist"#저장소
+    destination_path = "./Mac/mac_result/Downloads.plist"#저장소
 
     # 파일이 이미 존재하면 삭제
     if os.path.exists(destination_path):
@@ -80,7 +76,7 @@ except:
 
 try:
     source_path = f"/Users/{username}/Library/Application Support/Google/Chrome/Default/History"  # 복사할 대상
-    destination_path = "./web_history/chrome_History"#저장소
+    destination_path = "./Mac/mac_result/chrome_History"#저장소
     
 
     # 파일이 이미 존재하면 삭제

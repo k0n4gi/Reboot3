@@ -5,7 +5,7 @@ document_extensions = ['txt', 'doc', 'docx', 'pdf', 'ppt', 'pptx', 'odt', 'md', 
 
 # 검색할 디렉터리 경로 설정
 search_directory = '/'  # 실제 디렉터리 경로로 바꿔주세요
-output_file_path = 'document_files.txt'  # 결과를 저장할 텍스트 파일 경로
+output_file_path = './Mac/mac_result/document_files.txt'  # 결과를 저장할 텍스트 파일 경로
 
 # 모든 문서 파일 목록을 저장할 리스트
 document_files = []
