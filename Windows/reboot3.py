@@ -9,6 +9,9 @@ import subprocess
 import winreg
 import base64
 import subprocess
+import psutil
+import datetime
+import socket
 
 def init():
 	f = Figlet(font='slant')
@@ -28,6 +31,14 @@ def showOptions():
 	print("9) SRUM (System Resource Utilization Monitor)")
 	print("10) Environment Variables")
 	print("11) Patch List")
+	print("12) Process List")
+	print("13) Opened Port")
+	print("14) IP Config Info")
+	print("15) ARP Info")
+	print("16) Net BIOS")
+	print("17) Opened Handle")
+	print("18) Task Schedule Info")
+	print("19) System Logon Info")
 	print("20) UserAssist")
 	print("21) AutoRun")
 	print("22) Registry User")
@@ -35,6 +46,11 @@ def showOptions():
 	print("24) Recycle Bin")
 	print("25) LNK File")
 	print("26) PowerShell Log File")
+	print("27) Registerd Service Info")
+	print("28) Recent Activity Info")
+	print("29) Prefetch")
+	print("30) NTFS Artifact")
+	print("777) ALL")
 	print("0) exit program")
 
 def registryHive():
@@ -284,6 +300,189 @@ def patchList():
 	except Exception as e:
 		print(f"Error: {e}")
 
+def processList():
+	print("\n==========Process List File==========")
+	file_path = os.getcwd()
+	file_path = os.path.join(file_path, "ProcessList")
+	if not os.path.exists(file_path):
+		os.makedirs(file_path)
+	file_path = os.path.join(file_path, "process_list.txt")
+
+	process_info_list = []
+
+	for process in psutil.process_iter(attrs=['pid', 'name', 'username', 'memory_info']):
+		info = process.info
+		pid = info['pid']
+		name = info['name']
+		username = info['username']
+		memory = info['memory_info'].rss  # Resident Set Size: 메모리 사용량
+
+		process_info = f"PID: {pid}, Process Name: {name}, User: {username}, Memory: {memory} bytes"
+		process_info_list.append(process_info)
+    
+	with open(file_path, 'w') as f:
+		for process in process_info_list:
+			f.write(process + '\n')
+	
+	print(f"실행 중인 프로세스 정보가 {file_path} 에 저장되었습니다.")
+
+def openPort():
+	print("\n==========Open Port File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "OpenPort")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+	file_path = os.path.join(destination_folder, "open_ports.txt")
+
+	open_ports = []
+
+	for conn in psutil.net_connections(kind='inet'):
+		laddr, raddr, status, pid = conn.laddr, conn.raddr, conn.status, conn.pid
+		if raddr:
+			open_ports.append(f"{laddr} <--> {raddr} {status} {pid}")
+		else:
+			open_ports.append(f"{laddr} {status} {pid}")
+
+	with open(file_path, 'w') as f:
+		for port in open_ports:
+			f.write(f"{port}\n")
+	
+	print(f"Open port information has been saved to {file_path}")
+
+def IPConfigInfo():
+	print("\n==========IP Config File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "IPConfig")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
+	ip_info = {}
+	hostname = socket.gethostname()
+	local_ip = socket.gethostbyname(hostname)
+    
+	ip_info["Hostname"] = hostname
+	ip_info["Local IP"] = local_ip
+    
+	interfaces = psutil.net_if_addrs()
+	for interface, addrs in interfaces.items():
+		ip_info[interface] = []
+		for addr in addrs:
+			ip_info[interface].append(str(addr))
+
+	filename = os.path.join(destination_folder, f"ip_info_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+	with open(filename, 'w') as f:
+		for key, value in ip_info.items():
+			f.write(f"{key}: {value}\n")
+
+	print(f"IP 설정 정보가 {filename} 에 저장되었습니다.")	
+
+def arpInfo():
+	print("\n==========ARP Info File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "ARPInfo")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
+	try:
+        # 'arp -a' 명령을 실행하고 결과를 반환받습니다.
+		arp_output = subprocess.check_output("arp -a", shell=True, stderr=subprocess.STDOUT, text=True)
+	except subprocess.CalledProcessError as e:
+		arp_output = f"An error occurred while trying to fetch ARP info: {str(e)}"
+    # 파일 이름에 현재 시간을 추가하여 고유하게 만듭니다.
+	filename = os.path.join(destination_folder, f"arp_info_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    # ARP 정보를 .txt 파일에 저장합니다.
+	with open(filename, 'w') as f:
+		f.write(arp_output)
+	
+	print(f"ARP 정보가 {filename} 에 저장되었습니다.")	
+
+def netBIOS():
+	print("\n==========Net BIOS File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "NetBIOS")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
+	try:
+        # 'nbtstat -n' 명령을 실행하고 그 결과를 반환합니다.
+		netbios_output = subprocess.check_output("nbtstat -n", shell=True, stderr=subprocess.STDOUT, text=True)
+	except subprocess.CalledProcessError as e:
+		netbios_output = f"An error occurred while trying to fetch NetBIOS info: {str(e)}"
+
+    # 파일 이름에 현재 시간을 추가해 고유한 파일을 생성합니다.
+	filename = os.path.join(destination_folder, f"netbios_info_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    # NetBIOS 정보를 .txt 파일에 저장합니다.
+	with open(filename, 'w') as f:
+		f.write(netbios_output)
+
+	print(f"NetBIOS 정보가 {filename} 에 저장되었습니다.")	
+
+def openedHandle():
+	print("\n==========Opened Handle File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "OpenHandle")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
+	processes = []
+
+	for proc in psutil.process_iter(['pid', 'name', 'open_files']):
+		processes.append(proc.info)
+   
+    # 파일 이름에 현재 시간을 추가해 고유한 파일을 생성합니다.
+	filename = os.path.join(destination_folder, f"handle_info_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    # 핸들 정보를 .txt 파일에 저장합니다.
+	with open(filename, 'w') as f:
+		for proc in processes:
+			f.write(f"PID: {proc['pid']}, Name: {proc['name']}\n")
+			if proc['open_files']:
+				for open_file in proc['open_files']:
+					f.write(f"\t{open_file}\n")
+
+	print(f"열려있는 핸들 정보가 {filename} 에 저장되었습니다.")	
+
+def taskSchedule():
+	print("\n==========Task Schedule File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "JobSchedule")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
+	try:
+        # 'schtasks' 명령을 실행하고 그 결과를 반환합니다.
+		output = subprocess.check_output("schtasks /query /fo LIST", shell=True, stderr=subprocess.STDOUT, text=True)
+	except subprocess.CalledProcessError as e:
+		output = f"An error occurred while trying to fetch task scheduler info: {str(e)}"
+
+    # 파일 이름에 현재 시간을 추가해 고유한 파일을 생성합니다.
+	filename = os.path.join(destination_folder, f"task_scheduler_info_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    # 작업 스케줄러 정보를 .txt 파일에 저장합니다.
+	with open(filename, 'w') as f:
+		f.write(output)
+	
+	print(f"작업 스케줄 정보가 {filename} 에 저장되었습니다.")
+
+def systemLogon():
+	print("\n==========System Logon File==========")
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "SystemLogon")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+	file_path = os.path.join(destination_folder, "logon_history.txt")
+
+	query = "wevtutil qe Security /q:\"*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and (EventID=4624)]]\" /c:1 /rd:true /f:text"
+	result = subprocess.run(query, capture_output=True, text=True, shell=True)
+
+
+	with open(file_path, 'w') as f:
+		f.write(result.stdout)
+
+	print(f"시스템 로그온 정보가 {file_path} 에 저장되었습니다.")
 
 def memoryDump():
 	print("\n==========MemoryDump File==========")
@@ -568,6 +767,106 @@ def PowerShellLogFile():
 			except Exception as e:
 				print(f"복사 실패: {file}, 오류: {e}")
 
+def registeredService():
+	print("\n==========Registered Service File==========")
+	# PowerShellLog 폴더 생성 후 저장
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "RegisteredService")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+	filename = os.path.join(destination_folder, f"service_info_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+	
+
+	try:
+        # 'sc query' 명령을 실행하여 서비스 정보를 가져옵니다.
+		output = subprocess.check_output("sc query", shell=True, text=True, stderr=subprocess.STDOUT)
+	except subprocess.CalledProcessError as e:
+		output = f"An error occurred while trying to fetch service info: {str(e)}"
+
+	# 서비스 정보를 .txt 파일에 저장합니다.
+	with open(filename, 'w') as f:
+		f.write(output)
+
+	print(f"등록된 서비스 정보가 {filename} 에 저장되었습니다.")
+	
+def recentActivity():
+	print("\n==========Recent Activity File==========")
+	# PowerShellLog 폴더 생성 후 저장
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "RecentActivity")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+    # Recent Items 폴더의 경로를 가져옵니다.
+	recent_folder = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Recent')
+
+	recent_items = []
+
+    # 폴더 내의 모든 파일과 폴더를 나열합니다.
+	for item in os.listdir(recent_folder):
+		item_path = os.path.join(recent_folder, item)
+		item_stat = os.stat(item_path)
+        
+        # 파일의 마지막 액세스 시간을 가져옵니다.
+		last_access_time = datetime.datetime.fromtimestamp(item_stat.st_atime).strftime('%Y-%m-%d %H:%M:%S')
+		recent_items.append(f"{item}: Last accessed at {last_access_time}")
+        
+	# 파일 이름에 현재 시간을 추가해 고유한 파일을 생성합니다.
+	filename = os.path.join(destination_folder, f"recent_activity_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
+    
+    # 최근 활동 정보를 .txt 파일에 저장합니다.
+	with open(filename, 'w') as f:
+		for info in recent_items:
+			f.write(f"{info}\n")
+	print(f"최근 활동 정보가 {filename} 에 저장되었습니다.")
+		
+def prefetch():
+	print("\n==========Prefetch File==========")
+	# PowerShellLog 폴더 생성 후 저장
+	current_directory = os.path.dirname(os.path.abspath(__file__))
+	destination_folder = os.path.join(current_directory, "Prefetch")
+	if not os.path.exists(destination_folder):
+		os.makedirs(destination_folder)
+
+	# Prefetch 폴더 경로
+	prefetch_path = r"C:\Windows\Prefetch"
+	# Prefetch 폴더에서 .pf 파일 목록 수집
+	try:
+		prefetch_files = [f for f in os.listdir(prefetch_path) if f.endswith('.pf')]
+	except PermissionError:
+		print("관리자 권한이 필요합니다.")
+		exit()
+	
+	for prefetch_file in prefetch_files:
+		source_file = os.path.join(prefetch_path, prefetch_file)
+		destination_file = os.path.join(destination_folder, prefetch_file)
+		shutil.copy(source_file, destination_file)
+
+	print(f"prefetch 파일이 {destination_file} 에 저장되었습니다.")
+
+def NTFS():
+	print("\n==========NTFS Artifact File==========")
+	script_dir = os.path.dirname(os.path.abspath(__file__))
+	ntfs_folder = os.path.join(script_dir, 'NTFS')
+	os.makedirs(ntfs_folder, exist_ok=True)  # 'NTFS' 폴더 생성 (이미 존재하면 무시)
+
+    # 복사할 NTFS 시스템 파일
+	ntfs_files = ["$MFT", "$LogFile", "$Extend\\$UsnJrnl:$J"]
+    
+	for ntfs_file in ntfs_files:
+		source_file = "C:\\" + ntfs_file
+		destination_file_name = ntfs_file.replace('$', '').replace(':', '').replace('\\', '_') + ".txt"
+		destination_file = os.path.join(ntfs_folder, destination_file_name)
+        
+		command = "fsutil file queryextents {} > {}".format(source_file, destination_file)
+        
+		try:
+			subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE)
+			print("{}를 성공적으로 복사했습니다.".format(source_file))	
+		except subprocess.CalledProcessError as e:
+			print("{}를 복사하는 데 실패했습니다: {}".format(source_file, e.stderr.decode('utf-8')))
+
+	print(f"NTFS 파일이 {destination_file} 에 저장되었습니다.")
+
 def main():
 	init()
 	while(True):	
@@ -598,7 +897,23 @@ def main():
 		elif options == "10":
 			environmentVar()
 		elif options == "11":
-			patchList()			
+			patchList()		
+		elif options == "12":
+			processList()	
+		elif options == "13":
+			openPort()
+		elif options == "14":
+			IPConfigInfo()
+		elif options == "15":
+			arpInfo()
+		elif options == "16":
+			netBIOS()
+		elif options == "17":
+			openedHandle()
+		elif options == "18":
+			taskSchedule()
+		elif options == "19":
+			systemLogon()
 		elif options == "20":
 			userAssist()
 		elif options == "21":
@@ -613,6 +928,45 @@ def main():
 			lnkFile()
 		elif options == "26":
 			PowerShellLogFile()
+		elif options == "27":
+			registeredService()
+		elif options == "28":
+			recentActivity()
+		elif options == "29":
+			prefetch()
+		elif options == "30":
+			NTFS()
+		elif options == "777":
+			memoryDump()
+			registryHive()
+			systemInfo()
+			systemAudit()
+			groupPolicy()
+			eventLog()
+			serviceLog()
+			hostsData()
+			srum()
+			environmentVar()
+			patchList()
+			processList()
+			openPort()
+			IPConfigInfo()
+			arpInfo()
+			netBIOS()
+			openedHandle()
+			taskSchedule()
+			systemLogon()
+			userAssist()
+			autoRun()
+			registryUser()
+			save_browser_history()
+			recycleBin()
+			lnkFile()
+			PowerShellLogFile()
+			registeredService()
+			recentActivity()
+			prefetch()
+			NTFS()
 		else :
 			print("\nPlease input correct options!")
 			pass
