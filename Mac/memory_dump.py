@@ -1,3 +1,5 @@
+# MacPmem.kext를 찾는 명령어 >> sudo find / -name MacPmem.kext 2>/dev/null
+
 import subprocess
 import os
 
