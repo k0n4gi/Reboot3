@@ -64,4 +64,4 @@ for label, cmd in commands_labels.items():
 # 결과를 'forensics_output.txt' 파일에 저장
 with open('/tmp/forensics_output.txt', 'w', encoding='utf-8') as f:
     f.write(output)
-    print('/tmp 경로 아래에 파일이 저장되었습니다.')
+    print('/tmp 경로 아래에 결과 파일을 저장했습니다.')
